@@ -3,8 +3,8 @@ import {Bool, Character, Field, Int64, method, Poseidon, Provable, SmartContract
 
 export class Perpetual extends SmartContract {
   @state (Field) position = State<Field>();
-  @state (Field) closed = State<Bool>();
-  @state (Field) pnl = State<Int64>();
+  @state (Bool) closed = State<Bool>();
+  @state (Int64) pnl = State<Int64>();
 
   @method initState(
     salt: Field,
@@ -27,7 +27,6 @@ export class Perpetual extends SmartContract {
     this.position.assertEquals(this.position.get());
     this.closed.assertEquals(this.closed.get());
     this.pnl.assertEquals(this.pnl.get());
-    // const FALSE = Bool(false);
     this.closed.assertEquals(Bool(false));
 
     Poseidon.hash([salt, type.value, collateral.value, leverage.value, openPrice.value]).assertEquals(this.position.get());
@@ -35,22 +34,20 @@ export class Perpetual extends SmartContract {
 
     const SCALING_FACTOR = Int64.from(1_000_000_000).toConstant(); // multiply precision factor
     const LEVERAGE_BASE = UInt64.from(1_000_000).toConstant(); // leverage input decimals
-    //
+
     const leveraged_pos = collateral.mul(leverage).div(LEVERAGE_BASE);
     let pnl = Provable.if(
       closePrice.lessThanOrEqual(openPrice),
       SCALING_FACTOR.sub(Int64.fromUnsigned(closePrice).mul(SCALING_FACTOR).div(openPrice)),
       Int64.fromUnsigned(closePrice).mul(SCALING_FACTOR).div(openPrice).sub(SCALING_FACTOR)
     );
-    //
     pnl = Provable.if(
       type.equals(Character.fromString('s')),
       pnl.neg(),
       pnl
     );
-    //
     pnl = pnl.mul(leveraged_pos).div(SCALING_FACTOR);
-    // this.closed.set(Bool(true));
+    this.closed.set(Bool(true));
     this.pnl.set(pnl);
   }
 }
