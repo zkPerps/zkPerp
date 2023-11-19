@@ -1,4 +1,13 @@
 {
   "version": 1,
-  "deployAliases": {}
+  "deployAliases": {
+    "zkperpsberkley": {
+      "url": "https://proxy.berkeley.minaexplorer.com/",
+      "keyPath": "keys/zkperpsberkley.json",
+      "feepayerKeyPath": "/home/maga/.cache/zkapp-cli/keys/mainfeepayer.json",
+      "feepayerAlias": "mainfeepayer",
+      "fee": "1",
+      "smartContract": "Perpetual"
+    }
+  }
 }
